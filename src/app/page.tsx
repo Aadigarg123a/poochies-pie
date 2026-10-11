@@ -1,13 +1,19 @@
-import { Wordmark } from '@/components/layout/Wordmark'
-import { SITE } from '@/data/site'
+import { FlavourCarousel } from '@/components/home/FlavourCarousel'
+import { Hero } from '@/components/home/Hero'
+import { AtelierTeaser, FaqTeaser, HowItWorks, InstagramStrip, PawrtyTeaser } from '@/components/home/HomeSections'
+import { PromiseStrip } from '@/components/home/PromiseStrip'
 
 export default function HomePage() {
   return (
-    <section className="container-page page-x section-y text-center">
-      <p className="label">{SITE.tagline}</p>
-      <h1 className="mt-6 text-display">
-        <Wordmark />
-      </h1>
-    </section>
+    <>
+      <Hero />
+      <PromiseStrip />
+      <FlavourCarousel />
+      <AtelierTeaser />
+      <PawrtyTeaser />
+      <HowItWorks />
+      <InstagramStrip />
+      <FaqTeaser />
+    </>
   )
 }

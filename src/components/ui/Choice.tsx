@@ -149,7 +149,7 @@ export function FilterChip({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        'inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-[0.75rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-300',
+        'inline-flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-4 text-[0.75rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-300',
         pressed ? 'border-oxblood bg-oxblood text-cream' : 'border-field/60 text-ink hover:border-oxblood hover:text-oxblood',
       )}
     >
