@@ -200,6 +200,12 @@ function Builder({ params }: { params: URLSearchParams | null }) {
   return (
     <MotionConfig reducedMotion="user">
       <LazyMotion features={domAnimation} strict>
+        {gift ? (
+          <p className="mb-8 max-w-2xl rounded-[2px] border-l-2 border-blush bg-linen/70 px-5 py-4 text-[0.9375rem]">
+            <strong className="font-semibold text-oxblood">You’re gifting a Pup-cake.</strong> Build the cake, then tell us who it’s
+            for. Their pet’s details and your note go into the WhatsApp message.
+          </p>
+        ) : null}
         <div className="grid grid-cols-[minmax(0,1fr)] gap-10 pb-36 lg:grid-cols-[13rem_minmax(0,1fr)_21rem] lg:gap-12 lg:pb-24" data-builder>
           <aside className="-mx-4 min-w-0 border-y hairline px-4 py-2 sm:-mx-8 sm:px-8 lg:mx-0 lg:border-0 lg:p-0">
             <div className="lg:sticky lg:top-24">
@@ -366,6 +372,7 @@ function FlavourStep({ state, size, onChange }: { state: BuilderState; size: Cak
       legend={`Flavour for your ${sizeLabel(size)}`}
       hideLegend
       name="flavour"
+      columns={1}
       value={state.flavour}
       onChange={onChange}
       options={FLAVOURS.map((f) => ({
@@ -391,6 +398,7 @@ function FrostingStep({ value, onChange }: { value: FrostingId; onChange: (f: Fr
         legend="Frosting"
         hideLegend
         name="frosting"
+        columns={1}
         value={value}
         onChange={onChange}
         options={FROSTINGS.map((f) => ({ value: f.id, label: f.name, description: f.description, meta: 'Included' }))}
