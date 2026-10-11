@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/metadata'
 import { HowItWorks } from '@/components/home/HomeSections'
 import { ButtonAnchor, ButtonLink } from '@/components/ui/Button'
 import { Todo } from '@/components/ui/Todo'
 import { ORDERING, PAYMENT_RULE } from '@/config/ordering'
 import { FACTS, SITE, whatsappLink } from '@/data/site'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'How to order a dog or cat cake in Delhi',
   description:
     'How ordering works at Poochie’s Pie: order 1–2 days ahead, confirm with advance online payment, then choose doorstep delivery or self pick-up in Delhi NCR. Storage and allergy notes.',
-  alternates: { canonical: '/how-to-order' },
-}
+  path: '/how-to-order',
+})
 
 const SECTIONS = [
   {

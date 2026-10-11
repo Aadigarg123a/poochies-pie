@@ -20,7 +20,10 @@ import {
 } from '@/data/menu'
 import { whatsappLink } from '@/data/site'
 import { formatINR } from '@/lib/format'
+import { breadcrumbJsonLd, productJsonLd } from '@/lib/jsonld'
+import { pageMeta } from '@/lib/metadata'
 import { cakeBasePrice, fromPrice } from '@/lib/pricing'
+import { JsonLd } from '@/components/seo/JsonLd'
 
 export function generateStaticParams() {
   return PRODUCTS.map((p) => ({ slug: p.slug }))
@@ -32,11 +35,11 @@ export async function generateMetadata({ params }: PageProps<'/treats/[slug]'>):
   if (!product) return {}
   const from = formatINR(fromPrice(slug))
   const forWhom = product.species.includes('cat') ? (product.species.includes('dog') ? 'dogs & cats' : 'cats') : 'dogs'
-  return {
+  return pageMeta({
     title: `${product.name} for ${forWhom}, from ${from}`,
     description: `${product.name} by Poochie’s Pie, Delhi: ${product.tagline} From ${from}. Made to order${product.isFood ? ' with no sugar, salt, cocoa or preservatives' : ''}.`,
-    alternates: { canonical: `/treats/${slug}` },
-  }
+    path: `/treats/${slug}`,
+  })
 }
 
 function speciesLine(p: Product) {
@@ -58,6 +61,16 @@ export default async function ProductPage({ params }: PageProps<'/treats/[slug]'
 
   return (
     <div className="container-page page-x">
+      <JsonLd
+        data={[
+          productJsonLd(product),
+          breadcrumbJsonLd([
+            { name: 'Menu', path: '/menu' },
+            { name: category.name, path: `/menu?c=${category.id}` },
+            { name: product.name, path: `/treats/${product.slug}` },
+          ]),
+        ]}
+      />
       <nav aria-label="Breadcrumb" className="pt-8 text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/metadata'
 import { AddItemButton } from '@/components/pawrty/AddItemButton'
 import { BundleCard } from '@/components/pawrty/BundleCard'
 import { ButtonLink } from '@/components/ui/Button'
@@ -6,12 +7,12 @@ import { PriceRow } from '@/components/ui/PriceRow'
 import { BUNDLES } from '@/data/bundles'
 import { PRODUCTS, type SimpleProduct } from '@/data/menu'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Pawrty Planner: dog birthday party sets in Delhi',
   description:
     'Plan a dog birthday party in Delhi: a made-to-order cake, Happy Birthday cap, birthday bandana and Rainbow Cupcakes for the guest pets, plus bows, bandanas and bow-ties.',
-  alternates: { canonical: '/pawrty' },
-}
+  path: '/pawrty',
+})
 
 const accessories = PRODUCTS.filter((p): p is (typeof PRODUCTS)[number] & SimpleProduct => p.kind === 'accessory')
 

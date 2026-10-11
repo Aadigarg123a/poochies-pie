@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/metadata'
 import { ButtonAnchor } from '@/components/ui/Button'
 import { ChatIcon, InstagramIcon, PinIcon } from '@/components/ui/icons'
 import { Todo } from '@/components/ui/Todo'
 import { SITE, whatsappLink } from '@/data/site'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Contact: WhatsApp and Instagram',
-  description: 'Order or ask a question: message Poochie’s Pie on WhatsApp at +91 98100 15052, or follow @poochiespie on Instagram. Delhi NCR.',
-  alternates: { canonical: '/contact' },
-}
+  description:
+    'Order or ask a question: message Poochie’s Pie on WhatsApp at +91 98100 15052, or follow @poochiespie on Instagram. Delhi NCR.',
+  path: '/contact',
+})
 
 export default function ContactPage() {
   return (

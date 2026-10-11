@@ -5,7 +5,9 @@ import { ClientRuntime } from '@/components/layout/ClientRuntime'
 import { ConciergeButton } from '@/components/layout/ConciergeButton'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { SITE } from '@/data/site'
+import { bakeryJsonLd } from '@/lib/jsonld'
 import './globals.css'
 
 const fraunces = Fraunces({
@@ -46,8 +48,10 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     locale: SITE.locale,
     url: '/',
+    title: "Poochie's Pie · Haute pâtisserie for pets in Delhi",
+    description: SITE.description,
   },
-  twitter: { card: 'summary_large_image' },
+  twitter: { card: 'summary_large_image', title: "Poochie's Pie · Haute pâtisserie for pets in Delhi", description: SITE.description },
   formatDetection: { telephone: false },
 }
 
@@ -74,6 +78,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <ConciergeButton />
         <ClientRuntime />
         <Analytics />
+        <JsonLd data={bakeryJsonLd()} />
       </body>
     </html>
   )
