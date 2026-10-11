@@ -174,6 +174,8 @@ export interface SimpleProduct extends ProductBase {
   servedWith?: string
   /** Free-text facts printed on the menu for this item. */
   facts?: readonly string[]
+  /** Details the menu leaves out; shown as TODO(owner) placeholders. */
+  ownerTodos?: readonly string[]
 }
 
 export type Product = CakeProduct | MiniCakeProduct | PackProduct | SimpleProduct
@@ -349,6 +351,7 @@ export const PRODUCTS = [
     frosted: false,
     baked: true,
     facts: ['Gluten-free'],
+    ownerTodos: ['how many cookies are in a pack'],
     variants: [{ id: 'face-cookies', name: 'Pumpkin-carrot face-shaped cookies', price: 350 }],
   },
   {

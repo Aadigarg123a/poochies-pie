@@ -8,6 +8,7 @@ import { DietMark } from '@/components/ui/Badges'
 import { ButtonLink } from '@/components/ui/Button'
 import { ProductCard, DietSummary } from '@/components/ui/ProductCard'
 import { ProductImage } from '@/components/ui/ProductImage'
+import { Todo } from '@/components/ui/Todo'
 import {
   CAKE_SIZE_RULES,
   CATEGORIES,
@@ -114,6 +115,13 @@ export default async function ProductPage({ params }: PageProps<'/treats/[slug]'
               {product.servedWith ? `Served with a ${product.servedWith}. ` : null}
               {product.facts?.join(' · ')}
             </p>
+          ) : null}
+          {product.kind === 'treat' && product.ownerTodos?.length ? (
+            <div className="mt-4 space-y-2">
+              {product.ownerTodos.map((t) => (
+                <Todo key={t}>{t}</Todo>
+              ))}
+            </div>
           ) : null}
 
           <div className="mt-10">

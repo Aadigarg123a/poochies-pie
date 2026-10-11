@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const PORT = Number(process.env.E2E_PORT ?? 3200)
+/** Set E2E_BASE_URL to test a deployed site (e.g. the Netlify URL) instead of a local build. */
+const REMOTE = process.env.E2E_BASE_URL
 
 /**
  * E2E runs against a production build (`pnpm build` first).
@@ -14,7 +16,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   timeout: 60_000,
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: REMOTE ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
     timezoneId: 'Asia/Kolkata',
     locale: 'en-IN',
@@ -23,10 +25,12 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
   ],
-  webServer: {
-    command: `pnpm start --port ${PORT}`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: REMOTE
+    ? undefined
+    : {
+        command: `pnpm start --port ${PORT}`,
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+      },
 })

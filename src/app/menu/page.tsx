@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { pageMeta } from '@/lib/metadata'
 import { Suspense } from 'react'
-import { MenuExplorer, MenuExplorerFallback } from '@/components/menu/MenuExplorer'
+import { MenuFilters, MenuFiltersFallback } from '@/components/menu/MenuFilters'
+import { MenuView } from '@/components/menu/MenuView'
 import { NeverInIt } from '@/components/ui/Badges'
 import { FACTS } from '@/data/site'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -30,9 +31,10 @@ export default function MenuPage() {
           <NeverInIt className="lg:justify-self-end" />
         </div>
       </header>
-      <Suspense fallback={<MenuExplorerFallback />}>
-        <MenuExplorer />
+      <Suspense fallback={<MenuFiltersFallback />}>
+        <MenuFilters />
       </Suspense>
+      <MenuView />
     </div>
   )
 }

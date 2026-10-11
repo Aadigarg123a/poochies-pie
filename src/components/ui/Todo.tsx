@@ -11,7 +11,7 @@ export function Todo({ children, fallback = null, inline = false }: { children: 
   return (
     <Tag
       data-todo
-      className={`${inline ? 'inline-block' : 'block'} rounded-[2px] border border-dashed border-field bg-cream/70 px-2 py-1 font-sans text-xs leading-snug text-muted`}
+      className={`${inline ? 'inline-block' : 'block'} rounded-[2px] border border-dashed border-field bg-cream px-2 py-1 font-sans text-xs leading-snug text-muted`}
     >
       <span className="font-semibold text-rose">TODO(owner):</span> {children}
     </Tag>

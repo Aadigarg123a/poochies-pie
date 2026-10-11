@@ -1,0 +1,10 @@
+# Netlify builds Next.js natively (OpenNext-based runtime, detected automatically).
+[build]
+  command = "pnpm build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "24"
+  # Show TODO(owner) placeholders on previews; set to "false" in production once filled in.
+  NEXT_PUBLIC_SHOW_TODOS = "true"
+  NEXT_PUBLIC_CHECKOUT_PROVIDER = "whatsapp"

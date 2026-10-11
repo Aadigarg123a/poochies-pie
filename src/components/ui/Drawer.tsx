@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { CloseIcon } from './icons'
 
+const FOCUSABLE = 'a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])'
+
 interface DrawerProps {
   open: boolean
   onClose: () => void
@@ -44,6 +46,23 @@ export function Drawer({ open, onClose, title, hideTitle, side = 'right', childr
       onClick={(e) => {
         // A click on the backdrop lands on the <dialog> element itself.
         if (e.target === e.currentTarget) onClose()
+      }}
+      onKeyDown={(e) => {
+        // Keep Tab cycling inside the sheet instead of escaping to the browser UI.
+        if (e.key !== 'Tab') return
+        const focusable = [...e.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+          (el) => !el.hasAttribute('disabled') && el.offsetParent !== null,
+        )
+        if (!focusable.length) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
       }}
     >
       <div className="flex h-full flex-col">
