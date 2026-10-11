@@ -38,7 +38,7 @@ export function Stepper({
                 disabled={i > reachable}
                 aria-current={active ? 'step' : undefined}
                 className={cn(
-                  'group flex w-full items-center gap-3 rounded-[2px] px-2 py-2 text-left transition-colors lg:px-0 lg:py-4',
+                  'group relative flex w-full items-center gap-3 rounded-[2px] px-2 py-2 text-left transition-colors lg:px-0 lg:py-4',
                   'disabled:cursor-not-allowed',
                 )}
               >
