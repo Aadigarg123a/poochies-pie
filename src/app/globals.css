@@ -217,3 +217,45 @@ html:has(dialog[open]) {
     backdrop-filter: blur(0);
   }
 }
+
+/* ── Motion: soft hero parallax (CSS scroll timeline, no JS), slow seal, strike-throughs ── */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .hero-drift {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90vh;
+    }
+    .hero-drift-slow {
+      animation: hero-drift-slow linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90vh;
+    }
+  }
+  .seal-spin {
+    animation: seal-spin 60s linear infinite;
+  }
+  .js-reveal [data-reveal] .strike {
+    transform: scaleX(0) rotate(-3deg);
+    transition: transform 900ms var(--ease-soft) calc(var(--reveal-delay, 0ms) + 350ms);
+  }
+  .js-reveal [data-reveal].is-revealed .strike {
+    transform: scaleX(1) rotate(-3deg);
+  }
+}
+
+@keyframes hero-drift {
+  to {
+    transform: translateY(-56px);
+  }
+}
+@keyframes hero-drift-slow {
+  to {
+    transform: translateY(28px) rotate(-2deg);
+  }
+}
+@keyframes seal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
