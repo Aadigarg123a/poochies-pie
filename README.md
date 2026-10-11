@@ -68,6 +68,10 @@ The site is connected to Netlify from the GitHub repo:
 - **Pull requests → deploy previews.** Each PR gets its own preview URL.
 - Netlify builds Next.js natively. Settings are in [`netlify.toml`](netlify.toml) (Node 24, `pnpm build`).
 
+Live site: **https://poochies-pie.netlify.app** (Netlify project `poochies-pie`). The "Built with Netlify" badge/toolbar is switched off on purpose: on phones it covered the Atelier's sticky "Add to bag" bar.
+
+To test a deployed site end to end: `E2E_BASE_URL=https://poochies-pie.netlify.app pnpm e2e`.
+
 Environment variables (Netlify → Site configuration → Environment variables):
 
 | Variable | Value |
@@ -76,7 +80,12 @@ Environment variables (Netlify → Site configuration → Environment variables)
 | `NEXT_PUBLIC_SHOW_TODOS` | `true` on previews; `false` in production once OWNER_TODO is done |
 | `NEXT_PUBLIC_CHECKOUT_PROVIDER` | `whatsapp` |
 
-Manual deploy from a laptop: `pnpm exec netlify deploy --build` (preview) or `--prod`.
+Manual deploy from a laptop (log in once with `pnpm --package=netlify-cli dlx netlify login`):
+
+```bash
+pnpm --package=netlify-cli dlx netlify deploy --build          # draft preview URL
+pnpm --package=netlify-cli dlx netlify deploy --build --prod   # production
+```
 
 ## Project map
 
