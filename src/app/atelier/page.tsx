@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/metadata'
 import { Suspense } from 'react'
 import { AtelierBuilder, AtelierBuilderFallback } from '@/components/atelier/AtelierBuilder'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'The Atelier: build a custom dog cake with a name',
   description:
     'Design a custom dog or cat birthday cake in Delhi: choose the size, flavour, frosting, face and a name banner, and see the price as you go. Sugar-free, made to order.',
-  alternates: { canonical: '/atelier' },
-}
+  path: '/atelier',
+})
 
 export default function AtelierPage() {
   return (

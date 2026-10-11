@@ -1,20 +1,24 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/metadata'
 import { ButtonAnchor } from '@/components/ui/Button'
 import { Todo } from '@/components/ui/Todo'
 import { Accordion } from '@/components/ui/Typography'
 import { FAQ } from '@/data/faq'
 import { whatsappLink } from '@/data/site'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { faqJsonLd } from '@/lib/jsonld'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'FAQ: sugar-free dog cakes, cat cakes, delivery and allergies',
   description:
     'Answers about Poochie’s Pie cakes in Delhi: what is never in them, how far ahead to order, payment, allergies, cats, delivery or pick-up, storage and name banners.',
-  alternates: { canonical: '/faq' },
-}
+  path: '/faq',
+})
 
 export default function FaqPage() {
   return (
     <div className="container-page page-x pb-24">
+      <JsonLd data={faqJsonLd(FAQ)} />
       <header className="max-w-3xl pb-12 pt-12 sm:pt-16">
         <p className="label">Questions & answers</p>
         <h1 className="mt-5 text-display">

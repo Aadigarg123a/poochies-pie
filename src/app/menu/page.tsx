@@ -1,19 +1,23 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/metadata'
 import { Suspense } from 'react'
 import { MenuExplorer, MenuExplorerFallback } from '@/components/menu/MenuExplorer'
 import { NeverInIt } from '@/components/ui/Badges'
 import { FACTS } from '@/data/site'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { menuJsonLd } from '@/lib/jsonld'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'The Menu: dog & cat cakes, Dognuts, cupcakes and treats',
   description:
     'The full Poochie’s Pie menu with prices in rupees: sugar-free dog birthday cakes in nine flavours, mini cakes, Crazy Dognuts, Rainbow Cupcakes, treats and party accessories. Made to order in Delhi.',
-  alternates: { canonical: '/menu' },
-}
+  path: '/menu',
+})
 
 export default function MenuPage() {
   return (
     <div className="container-page page-x">
+      <JsonLd data={menuJsonLd()} />
       <header className="pb-10 pt-14 sm:pt-20">
         <p className="label">Prices in rupees · Baked to order</p>
         <h1 className="mt-5 text-display">

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/metadata'
 import { Seal } from '@/components/layout/Wordmark'
 import { ButtonAnchor, ButtonLink } from '@/components/ui/Button'
 import { NeverInIt } from '@/components/ui/Badges'
@@ -7,12 +8,12 @@ import { Todo } from '@/components/ui/Todo'
 import { BrushStroke } from '@/components/ui/Typography'
 import { FACTS, PROMISE, SITE } from '@/data/site'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'About: a home pet bakery in Delhi',
   description:
     'Poochie’s Pie is a home-based pet bakery in Delhi making fresh, made-to-order pup-cakes and treats for dogs and cats, with no sugar, salt, cocoa or preservatives.',
-  alternates: { canonical: '/about' },
-}
+  path: '/about',
+})
 
 /**
  * The owner's story is a TODO. This layout reads well without it: the facts
