@@ -8,8 +8,8 @@ export const SITE = {
   tagline: 'Haute pâtisserie for pets · Delhi',
   description:
     "Poochie's Pie is a home-based pet bakery in Delhi making fresh, made-to-order pup-cakes and treats for dogs and cats, delivered to your doorstep. No sugar, no salt, no cocoa, no preservatives.",
-  /** Production URL. Set NEXT_PUBLIC_SITE_URL on Vercel. TODO(owner): domain name. */
-  url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://poochies-pie.vercel.app').replace(/\/$/, ''),
+  /** Production URL. Set NEXT_PUBLIC_SITE_URL in Netlify. TODO(owner): domain name. */
+  url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://poochies-pie.netlify.app').replace(/\/$/, ''),
   locale: 'en_IN',
   whatsapp: {
     display: '+91 98100 15052',

@@ -1,6 +1,5 @@
-import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Fraunces, Manrope, Pacifico } from 'next/font/google'
+import localFont from 'next/font/local'
 import { ClientRuntime } from '@/components/layout/ClientRuntime'
 import { ConciergeButton } from '@/components/layout/ConciergeButton'
 import { SiteFooter } from '@/components/layout/SiteFooter'
@@ -10,22 +9,28 @@ import { SITE } from '@/data/site'
 import { bakeryJsonLd } from '@/lib/jsonld'
 import './globals.css'
 
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  axes: ['opsz'],
-  style: ['normal', 'italic'],
+// All fonts are subset to the site's characters (scripts/fetch-fonts.mjs)
+// so the critical font payload stays small on mobile. One file per style covers 300–400.
+const fraunces = localFont({
+  src: [
+    { path: '../fonts/fraunces-400.woff2', weight: '300 400', style: 'normal' },
+    { path: '../fonts/fraunces-300-italic.woff2', weight: '300 400', style: 'italic' },
+  ],
   variable: '--font-fraunces',
   display: 'swap',
+  adjustFontFallback: 'Times New Roman',
 })
 
-const manrope = Manrope({
-  subsets: ['latin'],
+const manrope = localFont({
+  src: '../fonts/manrope-400-600.woff2',
+  weight: '400 600',
   variable: '--font-manrope',
   display: 'swap',
+  adjustFontFallback: 'Arial',
 })
 
-const pacifico = Pacifico({
-  subsets: ['latin'],
+const pacifico = localFont({
+  src: '../fonts/pacifico-wordmark.woff2',
   weight: '400',
   variable: '--font-pacifico',
   display: 'swap',
@@ -66,7 +71,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       <body className="flex min-h-dvh flex-col antialiased">
         <a
           href="#main"
-          className="sr-only z-50 rounded-sm bg-oxblood px-4 py-2 text-cream focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+          className="fixed left-4 top-[-6rem] z-50 rounded-sm bg-oxblood px-5 py-3 text-sm font-semibold text-cream transition-[top] focus:top-4"
         >
           Skip to content
         </a>
@@ -77,7 +82,6 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <SiteFooter />
         <ConciergeButton />
         <ClientRuntime />
-        <Analytics />
         <JsonLd data={bakeryJsonLd()} />
       </body>
     </html>

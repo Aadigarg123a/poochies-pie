@@ -3,27 +3,31 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { FilterChip } from '@/components/ui/Choice'
 import { CATEGORIES } from '@/data/menu'
-import { DEFAULT_FILTERS, filtersToQuery, isFiltered, parseFilters, type MenuFilters } from '@/lib/menuFilters'
+import { whatsappLink } from '@/data/site'
+import { DEFAULT_FILTERS, filtersToQuery, hiddenSelectors, isFiltered, parseFilters, type MenuFilters as Filters } from '@/lib/menuFilters'
 import { usePawfileStore } from '@/stores/pawfile'
 import { useUIStore } from '@/stores/ui'
-import { whatsappLink } from '@/data/site'
-import { MenuView } from './MenuView'
 
-/** Interactive menu: filters live in the URL so a filtered menu can be shared. */
-export function MenuExplorer() {
+/**
+ * Menu filters. The menu itself (MenuView) is server-rendered with every item;
+ * this component only hides what the filters exclude, via a generated style
+ * rule, and keeps the filters in the URL so a filtered menu can be shared.
+ */
+export function MenuFilters() {
   const params = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
   const filters = parseFilters(params)
   const pawfile = usePawfileStore((s) => s.pawfile)
+  const { selectors, visibleCount } = hiddenSelectors(filters, pawfile)
 
-  const update = (patch: Partial<MenuFilters>) => {
-    const next = { ...filters, ...patch }
-    router.replace(`${pathname}${filtersToQuery(next)}`, { scroll: false })
+  const update = (patch: Partial<Filters>) => {
+    router.replace(`${pathname}${filtersToQuery({ ...filters, ...patch })}`, { scroll: false })
   }
 
   return (
     <>
+      {selectors.length ? <style>{`${selectors.join(',')}{display:none!important}`}</style> : null}
       <FilterBar filters={filters} onChange={update} hasPawfile={Boolean(pawfile)} petName={pawfile?.name} />
       {filters.pet === 'cat' ? (
         <p role="status" className="mt-8 rounded-[2px] border-l-2 border-blush bg-linen/70 px-5 py-4 text-[0.9375rem]">
@@ -40,19 +44,19 @@ export function MenuExplorer() {
           (chicken, mutton, fish); please mention every allergy when you order.
         </p>
       ) : null}
-      <MenuView filters={filters} pawfile={pawfile} />
+      {visibleCount === 0 ? (
+        <div role="status" className="py-24 text-center">
+          <p className="font-display text-3xl text-oxblood">Nothing matches those filters.</p>
+          <p className="mt-3 text-muted">Try clearing a filter, or ask us on WhatsApp: customisation is available on request.</p>
+        </div>
+      ) : null}
     </>
   )
 }
 
-/** Static stand-in rendered into the prerendered HTML (before search params are known). */
-export function MenuExplorerFallback() {
-  return (
-    <>
-      <FilterBar filters={DEFAULT_FILTERS} onChange={() => {}} hasPawfile={false} disabled />
-      <MenuView />
-    </>
-  )
+/** Static stand-in in the prerendered HTML (before search params are known). */
+export function MenuFiltersFallback() {
+  return <FilterBar filters={DEFAULT_FILTERS} onChange={() => {}} hasPawfile={false} disabled />
 }
 
 function FilterBar({
@@ -62,8 +66,8 @@ function FilterBar({
   petName,
   disabled,
 }: {
-  filters: MenuFilters
-  onChange: (patch: Partial<MenuFilters>) => void
+  filters: Filters
+  onChange: (patch: Partial<Filters>) => void
   hasPawfile: boolean
   petName?: string
   disabled?: boolean
@@ -142,7 +146,7 @@ function FilterBar({
   )
 }
 
-function describe(f: MenuFilters, petName?: string) {
+function describe(f: Filters, petName?: string) {
   const parts: string[] = []
   if (f.category !== 'all') parts.push(CATEGORIES.find((c) => c.id === f.category)!.name)
   if (f.pet !== 'all') parts.push(f.pet === 'dog' ? 'Dog' : 'Cat')

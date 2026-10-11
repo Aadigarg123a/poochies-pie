@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m } from 'motion/react'
+import { AnimatePresence, LazyMotion, MotionConfig, m } from 'motion/react'
 import { useSearchParams } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { PawfileFlavourFlag } from '@/components/pawfile/PawfileFlags'
@@ -28,6 +28,8 @@ import { addOnsForSize, cakeBasePrice, priceCake, sizeLabel, validateCake, type 
 import { useCartStore, type PetDetails } from '@/stores/cart'
 import { usePawfileStore } from '@/stores/pawfile'
 import { useUIStore } from '@/stores/ui'
+
+const loadMotionFeatures = () => import('./motion-features').then((mod) => mod.default)
 
 const STEPS = [
   { id: 'size', label: 'Size' },
@@ -123,7 +125,8 @@ function Builder({ params }: { params: URLSearchParams | null }) {
     return s.size ? (s.flavour ? 2 : 1) : 0
   })
   const [added, setAdded] = useState(false)
-  const headingRef = useRef<HTMLHeadingElement>(null)
+  // Set when the customer changes step; the next step's heading takes focus as it mounts.
+  const focusNextHeading = useRef(false)
 
   const pawfile = usePawfileStore((s) => s.pawfile)
   const savePawfile = usePawfileStore((s) => s.save)
@@ -152,8 +155,8 @@ function Builder({ params }: { params: URLSearchParams | null }) {
         pet: { name: pawfile.name, species: pawfile.species, allergies: [...pawfile.allergies], allergyNotes: pawfile.allergyNotes },
       }))
     }
+    focusNextHeading.current = true
     setStep(next)
-    requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: false }))
   }
 
   const add = () => {
@@ -199,7 +202,7 @@ function Builder({ params }: { params: URLSearchParams | null }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <LazyMotion features={domAnimation} strict>
+      <LazyMotion features={loadMotionFeatures} strict>
         {gift ? (
           <p className="mb-8 max-w-2xl rounded-[2px] border-l-2 border-blush bg-linen/70 px-5 py-4 text-[0.9375rem]">
             <strong className="font-semibold text-oxblood">You’re gifting a Pup-cake.</strong> Build the cake, then tell us who it’s
@@ -230,7 +233,15 @@ function Builder({ params }: { params: URLSearchParams | null }) {
                 <p className="label">
                   Step {step + 1} of {STEPS.length}
                 </p>
-                <h2 id="builder-step-title" ref={headingRef} tabIndex={-1} className="mt-3 text-title outline-none">
+                <h2
+                  id="builder-step-title"
+                  ref={(el) => {
+                    if (el && focusNextHeading.current) {
+                      focusNextHeading.current = false
+                      el.focus()
+                    }
+                  }}
+                  tabIndex={-1} className="mt-3 text-title outline-none">
                   {STEP_TITLES[step]}
                 </h2>
                 <div className="mt-8">

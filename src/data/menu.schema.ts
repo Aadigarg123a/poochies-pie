@@ -78,6 +78,7 @@ const product = z.discriminatedUnion('kind', [
     options: z.object({ label: z.string(), values: z.array(z.string().min(1)).min(1) }).optional(),
     servedWith: z.string().optional(),
     facts: z.array(z.string()).optional(),
+    ownerTodos: z.array(z.string()).optional(),
   }),
 ])
 

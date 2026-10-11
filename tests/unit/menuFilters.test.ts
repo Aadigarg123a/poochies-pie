@@ -35,3 +35,28 @@ describe('menu filters', () => {
     expect(productVisible(getProduct('rainbow-cupcakes')!, f, pet, SHARED_FLAVOUR_IDS)).toBe(true)
   })
 })
+
+describe('hiddenSelectors', () => {
+  it('hides nothing by default', async () => {
+    const { hiddenSelectors } = await import('@/lib/menuFilters')
+    expect(hiddenSelectors(DEFAULT_FILTERS, null)).toMatchObject({ selectors: [], visibleCount: PRODUCTS.length })
+  })
+
+  it('veg hides non-veg rows, items and the non-veg price column', async () => {
+    const { hiddenSelectors } = await import('@/lib/menuFilters')
+    const { selectors } = hiddenSelectors(q('diet=veg'), null)
+    expect(selectors).toContain('[data-row="celebration-cake:chicken-overloaded"]')
+    expect(selectors).toContain('[data-row="crazy-dognuts:chicken-farmhouse"]')
+    expect(selectors).toContain('[data-slug="pet-friendly-beer"]')
+    expect(selectors).toContain('[data-col="non-veg"]')
+    expect(selectors).not.toContain('[data-row="celebration-cake:going-bananas"]')
+  })
+
+  it('a category filter hides every other section', async () => {
+    const { hiddenSelectors } = await import('@/lib/menuFilters')
+    const { selectors, visibleCount } = hiddenSelectors(q('c=cupcakes'), null)
+    expect(visibleCount).toBe(1)
+    expect(selectors).toContain('[data-section="cakes"]')
+    expect(selectors).not.toContain('[data-section="cupcakes"]')
+  })
+})

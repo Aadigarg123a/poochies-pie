@@ -30,7 +30,7 @@ export function FlavourCarousel() {
         id="flavour-track"
         tabIndex={0}
         aria-label="Signature flavours (scrolls sideways)"
-        className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-[max(1rem,calc((100vw-76rem)/2+3rem))] pb-4 [scrollbar-width:none] focus-visible:outline-offset-[-4px] sm:gap-6 [&::-webkit-scrollbar]:hidden"
+        className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-[max(1rem,calc((100vw-76rem)/2+3rem))] scroll-px-[max(1rem,calc((100vw-76rem)/2+3rem))] pb-4 [scrollbar-width:none] focus-visible:outline-offset-[-4px] sm:gap-6 [&::-webkit-scrollbar]:hidden"
       >
         {FLAVOURS.map((f, i) => {
           const style = CARD_STYLES[i % CARD_STYLES.length]

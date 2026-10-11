@@ -14,6 +14,7 @@ export function PriceRow({
   aside,
   className,
   as: Tag = 'div',
+  dataRow,
 }: {
   name: ReactNode
   price: number
@@ -22,9 +23,11 @@ export function PriceRow({
   aside?: ReactNode
   className?: string
   as?: 'div' | 'li'
+  /** Hook for the menu filters (see hiddenSelectors). */
+  dataRow?: string
 }) {
   return (
-    <Tag className={cn('py-2.5', className)}>
+    <Tag className={cn('py-2.5', className)} data-row={dataRow}>
       <div className="flex items-baseline gap-3">
         <span className="min-w-0 font-display text-lg leading-snug text-ink sm:text-xl">{name}</span>
         {aside ? <span className="shrink-0 self-center">{aside}</span> : null}

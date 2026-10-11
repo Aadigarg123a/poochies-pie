@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Fragment } from 'react'
 import { PawfileFlavourFlag, PawfileProductFlags } from '@/components/pawfile/PawfileFlags'
 import { DietMark } from '@/components/ui/Badges'
 import { ArrowIcon } from '@/components/ui/icons'
@@ -27,8 +26,6 @@ import {
 } from '@/data/menu'
 import { cn } from '@/lib/cn'
 import { formatINR } from '@/lib/format'
-import { DEFAULT_FILTERS, flavourVisible, productVisible, type MenuFilters } from '@/lib/menuFilters'
-import type { Pawfile } from '@/stores/pawfile'
 
 const ALL_FLAVOURS = FLAVOURS.map((f) => f.id)
 
@@ -41,36 +38,26 @@ const INTRO: Record<Category, string> = {
   accessories: 'The finishing touches for the birthday portrait.',
 }
 
-function flavourIdsFor(p: Product): readonly FlavourId[] {
-  if (p.kind === 'cake' || p.kind === 'mini-cake') return ALL_FLAVOURS
-  if (p.kind === 'dognuts' || p.kind === 'cupcakes') return SHARED_FLAVOUR_IDS
-  return []
-}
-
-/** The printed tasting menu. Pure render: used for the static HTML and after filtering. */
-export function MenuView({ filters = DEFAULT_FILTERS, pawfile = null }: { filters?: MenuFilters; pawfile?: Pawfile | null }) {
+/**
+ * The printed tasting menu, rendered once on the server with every item.
+ * Filters (MenuFilters) hide rows via data attributes; see hiddenSelectors().
+ */
+export function MenuView() {
   const sections = CATEGORIES.map((c) => ({
     ...c,
-    products: (PRODUCTS as readonly Product[]).filter(
-      (p) => p.category === c.id && productVisible(p, filters, pawfile, flavourIdsFor(p)),
-    ),
-  })).filter((s) => s.products.length)
-
-  if (!sections.length) {
-    return (
-      <div className="py-24 text-center">
-        <p className="font-display text-3xl text-oxblood">Nothing matches those filters.</p>
-        <p className="mt-3 text-muted">Try clearing a filter, or ask us on WhatsApp: customisation is available on request.</p>
-      </div>
-    )
-  }
-
-  const visibleFlavours = (ids: readonly FlavourId[]) => ids.filter((id) => flavourVisible(id, filters, pawfile))
+    products: (PRODUCTS as readonly Product[]).filter((p) => p.category === c.id),
+  }))
 
   return (
     <div className="divide-y divide-hairline">
       {sections.map((section, i) => (
-        <section key={section.id} id={section.id} aria-labelledby={`menu-${section.id}`} className="scroll-mt-36 py-14 sm:py-20">
+        <section
+          key={section.id}
+          id={section.id}
+          data-section={section.id}
+          aria-labelledby={`menu-${section.id}`}
+          className="scroll-mt-36 py-14 sm:py-20"
+        >
           <div className="grid gap-10 lg:grid-cols-[19rem_1fr] lg:gap-16">
             <header className="lg:sticky lg:top-40 lg:self-start">
               <p className="label">{String(i + 1).padStart(2, '0')}</p>
@@ -88,14 +75,12 @@ export function MenuView({ filters = DEFAULT_FILTERS, pawfile = null }: { filter
             </header>
             <div className="min-w-0 space-y-12">
               {section.products.map((p) => (
-                <Fragment key={p.slug}>
-                  {p.kind === 'cake' ? <CakeBlock flavourIds={visibleFlavours(ALL_FLAVOURS)} /> : null}
-                  {p.kind === 'mini-cake' ? <MiniBlock flavourIds={visibleFlavours(ALL_FLAVOURS)} /> : null}
-                  {p.kind === 'dognuts' || p.kind === 'cupcakes' ? (
-                    <PackBlock product={p} flavourIds={visibleFlavours(SHARED_FLAVOUR_IDS)} diet={filters.diet} />
-                  ) : null}
+                <div key={p.slug} data-slug={p.slug}>
+                  {p.kind === 'cake' ? <CakeBlock /> : null}
+                  {p.kind === 'mini-cake' ? <MiniBlock /> : null}
+                  {p.kind === 'dognuts' || p.kind === 'cupcakes' ? <PackBlock product={p} /> : null}
                   {p.kind === 'treat' || p.kind === 'accessory' ? <SimpleBlock product={p} /> : null}
-                </Fragment>
+                </div>
               ))}
             </div>
           </div>
@@ -118,15 +103,16 @@ function BlockTitle({ name, href, sub }: { name: string; href: string; sub?: str
   )
 }
 
-function FlavourRows({ ids, prices }: { ids: readonly FlavourId[]; prices: Record<FlavourId, number> }) {
+function FlavourRows({ slug, prices }: { slug: string; prices: Record<FlavourId, number> }) {
   return (
     <ul>
-      {ids.map((id) => {
+      {ALL_FLAVOURS.map((id) => {
         const f = getFlavour(id)
         return (
           <PriceRow
             key={id}
             as="li"
+            dataRow={`${slug}:${id}`}
             name={<span className="italic">{f.name}</span>}
             aside={<DietMark diet={f.diet} showLabel={false} />}
             price={prices[id]}
@@ -157,11 +143,11 @@ function AddOnList({ title, list }: { title: string; list: readonly AddOn[] }) {
   )
 }
 
-function CakeBlock({ flavourIds }: { flavourIds: readonly FlavourId[] }) {
+function CakeBlock() {
   return (
     <div>
       <BlockTitle name={CAKE.name} href={`/treats/${CAKE.slug}`} sub="½ kg prices" />
-      <FlavourRows ids={flavourIds} prices={CAKE.halfKgPrices} />
+      <FlavourRows slug={CAKE.slug} prices={CAKE.halfKgPrices} />
       <dl className="mt-6 grid gap-3 text-[0.9375rem] sm:grid-cols-2">
         <div className="border-l-2 border-blush pl-4">
           <dt className="font-semibold">1 kg cake</dt>
@@ -180,28 +166,26 @@ function CakeBlock({ flavourIds }: { flavourIds: readonly FlavourId[] }) {
   )
 }
 
-function MiniBlock({ flavourIds }: { flavourIds: readonly FlavourId[] }) {
+function MiniBlock() {
   return (
     <div>
       <BlockTitle name={MINI_CAKE.name} href={`/treats/${MINI_CAKE.slug}`} sub={MINI_CAKE.weight} />
-      <FlavourRows ids={flavourIds} prices={MINI_CAKE.prices} />
+      <FlavourRows slug={MINI_CAKE.slug} prices={MINI_CAKE.prices} />
       <AddOnList title="Finishing touches · Mini cakes" list={MINI_ADD_ONS} />
       <CtaLink href="/atelier?size=mini">Build a mini cake</CtaLink>
     </div>
   )
 }
 
-function PackBlock({ product, flavourIds, diet }: { product: PackProduct; flavourIds: readonly FlavourId[]; diet: MenuFilters['diet'] }) {
-  const showVeg = diet !== 'non-veg'
-  const showNon = diet !== 'veg'
+function PackBlock({ product }: { product: PackProduct }) {
   return (
     <div>
       <BlockTitle name={product.name} href={`/treats/${product.slug}`} sub="Flavours from the shared list" />
       <ul className="flex flex-wrap gap-x-5 gap-y-2" aria-label={`${product.name} flavours`}>
-        {flavourIds.map((id) => {
+        {SHARED_FLAVOUR_IDS.map((id) => {
           const f = getFlavour(id)
           return (
-            <li key={id} className="inline-flex items-center gap-2 font-display text-lg italic">
+            <li key={id} data-row={`${product.slug}:${id}`} className="inline-flex items-center gap-2 font-display text-lg italic">
               <DietMark diet={f.diet} showLabel={false} />
               {f.name}
               <PawfileFlavourFlag flavour={id} />
@@ -216,16 +200,12 @@ function PackBlock({ product, flavourIds, diet }: { product: PackProduct; flavou
             <th scope="col" className="label py-2 font-semibold">
               {product.packLabel}
             </th>
-            {showVeg ? (
-              <th scope="col" className="label py-2 text-right">
-                Veg
-              </th>
-            ) : null}
-            {showNon ? (
-              <th scope="col" className="label py-2 text-right">
-                Non-veg
-              </th>
-            ) : null}
+            <th scope="col" data-col="veg" className="label py-2 text-right">
+              Veg
+            </th>
+            <th scope="col" data-col="non-veg" className="label py-2 text-right">
+              Non-veg
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -234,8 +214,12 @@ function PackBlock({ product, flavourIds, diet }: { product: PackProduct; flavou
               <th scope="row" className="py-3 font-display text-lg font-normal">
                 {product.packLabel} of {pack.count}
               </th>
-              {showVeg ? <td className="price py-3 text-right text-lg text-oxblood">{formatINR(pack.veg)}</td> : null}
-              {showNon ? <td className="price py-3 text-right text-lg text-oxblood">{formatINR(pack.nonVeg)}</td> : null}
+              <td data-col="veg" className="price py-3 text-right text-lg text-oxblood">
+                {formatINR(pack.veg)}
+              </td>
+              <td data-col="non-veg" className="price py-3 text-right text-lg text-oxblood">
+                {formatINR(pack.nonVeg)}
+              </td>
             </tr>
           ))}
         </tbody>
