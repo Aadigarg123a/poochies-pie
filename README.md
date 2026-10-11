@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Poochie's Pie
 
-## Getting Started
+Haute pâtisserie for pets, Delhi. The website for a home-based, made-to-order pet bakery: menu, cake builder (the Atelier), Pawrty Planner, Pawfile and a WhatsApp concierge checkout.
 
-First, run the development server:
+Built with Next.js 16 (App Router, fully static), TypeScript, Tailwind CSS 4, Zustand, Zod and Motion. Tested with Vitest and Playwright. Hosted on Netlify.
+
+Open owner questions and placeholders: **[OWNER_TODO.md](OWNER_TODO.md)**.
+
+## Run it locally
+
+Requires Node 22+ and pnpm.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Development server |
+| `pnpm build` | Validates the menu (Zod), then builds the static site |
+| `pnpm start` | Serves the production build |
+| `pnpm typecheck` / `pnpm lint` | TypeScript and ESLint |
+| `pnpm test` | Unit tests: menu integrity, pricing, dates, WhatsApp message, Pawfile, .ics, SEO, copy audit |
+| `pnpm e2e` | Playwright on mobile and desktop (run `pnpm build` first) |
+| `pnpm copy:audit` | Fails if the built pages make unbacked claims ("vet-approved", "award", "5-star", "review", …) |
+| `pnpm lighthouse` | Lighthouse mobile, median of 3 runs, against `pnpm start --port 3300` |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+CI (GitHub Actions) runs typecheck, lint, unit tests, build and E2E on every pull request.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to change prices or the menu
 
-## Learn More
+**Every item and price lives in one file: [`src/data/menu.ts`](src/data/menu.ts).** The menu page, product pages, the Atelier, the Pawrty Planner, the bag and the WhatsApp message all read from it.
 
-To learn more about Next.js, take a look at the following resources:
+1. Edit the price in `src/data/menu.ts` (whole rupees, e.g. `1150`).
+2. Make the same change in `tests/unit/expected-menu.ts`. This is deliberate: the menu-integrity test compares the two, so a typo can never reach customers.
+3. Run `pnpm test`. If it's green, commit and push. Netlify redeploys automatically.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Size rules live in `CAKE_SIZE_RULES` in the same file (1 kg = ½ kg price + ₹800; Bone-shaped 1 kg = ½ kg price + ₹900). Ordering rules (lead time, cut-off) are in `src/config/ordering.ts`. Brand facts (phone, Instagram, Google profile, delivery area) are in `src/data/site.ts`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## How to add photos
 
-## Deploy on Vercel
+Photos are wired through one component (`ProductImage`) and one map, [`src/data/photos.ts`](src/data/photos.ts):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Put the original in `src/assets/photos/` (JPG/PNG, at least 1600 px wide).
+2. Import it in `src/data/photos.ts` and map it to the product's slug, with a description:
+   ```ts
+   import beer from '@/assets/photos/beer.jpg'
+   export const PHOTOS = { 'pet-friendly-beer': { src: beer, alt: 'A bottle of chicken-based pet beer beside a dog bowl' } }
+   ```
+3. For the home hero, set `HERO_PHOTO` in the same file.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`next/image` serves AVIF/WebP at the right size. Until a slug has a photo, an art-directed placeholder with the item's name is shown. Don't use stock photos of other bakeries' cakes.
+
+## Fonts
+
+All fonts are self-hosted and subset to the characters the site uses, so phones download only ~60 KB of fonts. If the copy starts using new characters in the display serif (e.g. a new accented letter), re-run `node scripts/fetch-fonts.mjs` (OFL fonts from Google Fonts).
+
+## Checkout
+
+v1 has no online payment. The bag becomes a pre-filled WhatsApp message to +91 98100 15052 (items, total, date, delivery/pick-up, pet, allergies, gift details). The owner confirms and asks for advance payment, as today. A payment gateway (e.g. Razorpay) can be added later behind `NEXT_PUBLIC_CHECKOUT_PROVIDER` via the `CheckoutProvider` interface in `src/lib/checkout.ts`. It is stubbed and off.
+
+## Deploy (Netlify)
+
+The site is connected to Netlify from the GitHub repo:
+
+- **`main` → production.** Every merge to `main` deploys.
+- **Pull requests → deploy previews.** Each PR gets its own preview URL.
+- Netlify builds Next.js natively. Settings are in [`netlify.toml`](netlify.toml) (Node 24, `pnpm build`).
+
+Environment variables (Netlify → Site configuration → Environment variables):
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | The live URL, e.g. `https://poochiespie.in` (used for canonical links, sitemap, share images) |
+| `NEXT_PUBLIC_SHOW_TODOS` | `true` on previews; `false` in production once OWNER_TODO is done |
+| `NEXT_PUBLIC_CHECKOUT_PROVIDER` | `whatsapp` |
+
+Manual deploy from a laptop: `pnpm exec netlify deploy --build` (preview) or `--prod`.
+
+## Project map
+
+```
+src/data/menu.ts          the menu: single source of truth for items and prices
+src/data/site.ts          brand facts (phone, Instagram, area, TODOs)
+src/lib/pricing.ts        all price maths (cakes, packs, items)
+src/lib/whatsapp.ts       the WhatsApp order message
+src/lib/ics.ts            birthday reminder calendar file
+src/app/                  pages (/, /menu, /atelier, /pawrty, /treats/[slug], …), SEO files
+src/components/           UI, layout, menu, atelier, cart, pawfile, pawrty, product
+tests/unit, tests/e2e     Vitest and Playwright
+scripts/                  menu validation, copy audit, Lighthouse, font subsetting, icons
+```
