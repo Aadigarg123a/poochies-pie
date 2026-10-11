@@ -13,7 +13,7 @@ export function CartButton() {
       onClick={openCart}
       aria-haspopup="dialog"
       data-testid="cart-button"
-      className="group -mr-2 inline-flex h-11 items-center gap-2 rounded-full px-3 text-oxblood transition-colors hover:bg-linen"
+      className="group relative -mr-2 inline-flex h-11 items-center gap-2 rounded-full px-3 text-oxblood transition-colors hover:bg-linen"
     >
       <BagIcon />
       <span className="hidden text-[0.8125rem] font-semibold uppercase tracking-[0.16em] sm:inline">Bag</span>

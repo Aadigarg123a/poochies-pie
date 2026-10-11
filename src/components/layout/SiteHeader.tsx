@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { CartButton } from '@/components/cart/CartButton'
+import { PawfileButton } from '@/components/pawfile/PawfileButton'
 import { MobileNav } from './MobileNav'
 import { NavLinks } from './NavLinks'
 import { Wordmark } from './Wordmark'
@@ -17,7 +18,8 @@ export function SiteHeader() {
         <nav aria-label="Main" className="hidden lg:block">
           <NavLinks />
         </nav>
-        <div className="flex flex-1 items-center justify-end">
+        <div className="flex flex-1 items-center justify-end gap-1">
+          <PawfileButton />
           <CartButton />
         </div>
       </div>

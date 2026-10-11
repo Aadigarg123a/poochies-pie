@@ -7,16 +7,19 @@ import { usePawfileStore } from '@/stores/pawfile'
 import { useUIStore } from '@/stores/ui'
 
 const CartDrawer = dynamic(() => import('@/components/cart/CartDrawer').then((m) => m.CartDrawer), { ssr: false })
+const PawfileSheet = dynamic(() => import('@/components/pawfile/PawfileSheet').then((m) => m.PawfileSheet), { ssr: false })
 
 /**
  * Client-only plumbing mounted once in the root layout:
  * - rehydrates persisted stores after hydration (no SSR mismatch)
  * - enhances [data-reveal] sections with a scroll reveal
- * - lazy-loads the cart drawer on first open
+ * - lazy-loads the cart drawer and Pawfile sheet on first open
  */
 export function ClientRuntime() {
   const cartOpen = useUIStore((s) => s.cartOpen)
+  const pawfileOpen = useUIStore((s) => s.pawfileOpen)
   const [drawerLoaded, setDrawerLoaded] = useState(false)
+  const [pawfileLoaded, setPawfileLoaded] = useState(false)
 
   useEffect(() => {
     void useCartStore.persist.rehydrate()
@@ -25,10 +28,16 @@ export function ClientRuntime() {
 
   // Loading the drawer is a one-way latch: once opened, keep it mounted.
   if (cartOpen && !drawerLoaded) setDrawerLoaded(true)
+  if (pawfileOpen && !pawfileLoaded) setPawfileLoaded(true)
 
   useEffect(() => startReveal(), [])
 
-  return drawerLoaded ? <CartDrawer /> : null
+  return (
+    <>
+      {drawerLoaded ? <CartDrawer /> : null}
+      {pawfileLoaded ? <PawfileSheet /> : null}
+    </>
+  )
 }
 
 function startReveal() {
