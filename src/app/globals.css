@@ -43,6 +43,8 @@
 
 @layer base {
   html {
+    /* Guard: nothing may widen the page on phones (e.g. a stray absolutely positioned label). */
+    overflow-x: clip;
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
