@@ -66,7 +66,8 @@ The site is connected to Netlify from the GitHub repo:
 
 - **`main` → production.** Every merge to `main` deploys.
 - **Pull requests → deploy previews.** Each PR gets its own preview URL.
-- Netlify builds Next.js natively. Settings are in [`netlify.toml`](netlify.toml) (Node 24, `pnpm build`).
+- Netlify builds Next.js natively. Settings are in [`netlify.toml`](netlify.toml) (Node 24, `pnpm build`). The Next.js runtime (`@netlify/plugin-nextjs`) is pinned there on purpose: a build without it publishes the raw `.next` folder and every page 404s.
+- The repo is linked through the Netlify GitHub App (Project configuration → Build & deploy → Continuous deployment). The repo is **public** on purpose: on Netlify's Free plan, Git-triggered builds of a private repo were blocked ("Build blocked: Unrecognized Git contributor") even with the owner's GitHub account connected. Keep secrets out of the repo; use Netlify environment variables.
 
 Live site: **https://poochies-pie.netlify.app** (Netlify project `poochies-pie`). The "Built with Netlify" badge/toolbar is switched off on purpose: on phones it covered the Atelier's sticky "Add to bag" bar.
 
