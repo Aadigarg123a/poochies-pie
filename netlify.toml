@@ -8,3 +8,8 @@
   # Show TODO(owner) placeholders on previews; set to "false" in production once filled in.
   NEXT_PUBLIC_SHOW_TODOS = "true"
   NEXT_PUBLIC_CHECKOUT_PROVIDER = "whatsapp"
+
+# Pin Netlify's Next.js runtime explicitly. Without it, a Git-triggered build can
+# publish the raw .next folder (no server function) and every route 404s.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
